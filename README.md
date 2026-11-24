@@ -13,7 +13,6 @@ make babitonga grafo.txt saida.txt
 ```
 
 O programa termina sozinho em cerca de TEMPO s e grava em `saida.txt` uma linha com `n` caracteres `0` ou `1`.
-O log vai para a saída de erro.
 
 ## Requisitos
 

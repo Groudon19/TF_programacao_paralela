@@ -14,11 +14,11 @@ maxcut: maxcut.cpp
 
 # make run <entrada> <saida>: as duas palavras depois de "run" sao os arquivos.
 run: maxcut
-	mpirun --bind-to none --oversubscribe -np 2 ./maxcut $(word 2,$(MAKECMDGOALS)) $(word 3,$(MAKECMDGOALS))
+	MAXCUT_QUIET=1 mpirun --bind-to none --oversubscribe -np 2 ./maxcut $(word 2,$(MAKECMDGOALS)) $(word 3,$(MAKECMDGOALS))
 
 
 babitonga: maxcut
-	OMP_NUM_THREADS=8 mpirun --bind-to none --oversubscribe -np 2 ./maxcut $(word 2,$(MAKECMDGOALS)) $(word 3,$(MAKECMDGOALS))
+	OMP_NUM_THREADS=8 MAXCUT_QUIET=1 mpirun --bind-to none --oversubscribe -np 2 ./maxcut $(word 2,$(MAKECMDGOALS)) $(word 3,$(MAKECMDGOALS))
 
 # Faz o make ignorar essas duas palavras (senao ele tenta construi-las).
 %:
