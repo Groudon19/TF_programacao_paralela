@@ -3,5 +3,4 @@
 maxcut
 tools/gen_graph
 saida*.txt
-tf-maxcut/gerador
-tf-maxcut/verificador
+tf-maxcut/
