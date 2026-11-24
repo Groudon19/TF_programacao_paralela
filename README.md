@@ -5,10 +5,12 @@
 ## Como compilar e executar
 
 ```bash
-make                                   # gera ./maxcut (precisa de mpicxx com suporte a OpenMP)
-mpirun --bind-to none -np 2 ./maxcut grafo.txt saida.txt
-# ou:  make run IN=grafo.txt OUT=saida.txt NP=2
+make run grafo.txt saida.txt           # compila (se preciso) e executa com 2 ranks MPI
 ```
+
+Isso equivale a `make` seguido de
+`mpirun --bind-to none --oversubscribe -np 2 ./maxcut grafo.txt saida.txt`. É preciso ter `mpicxx`
+com suporte a OpenMP. Os caminhos relativos partem da pasta do projeto.
 
 O programa recebe os dois argumentos pedidos: o grafo e o arquivo de saída. Ele para sozinho
 quando o annealing chega a **80 s** desde o início, deixando folga para os 90 s do limite.
@@ -36,14 +38,13 @@ Nas instâncias pequenas do kit, o programa chegou ao valor de referência nas 3
 `exemplo_n5` = 3, `n20_s1` = 18, `n100_s1` = 118 e `n1000_s1` = 1.178.
 Para repetir esse teste: `make avaliar` (ou `make avaliar TEMPO=10`, para um teste rápido).
 
-Ferramentas de teste:
+Ferramentas de teste (todas do kit, pasta `tf-maxcut`):
 
 ```bash
-make tools                                     # gerador de grafos aleatórios
-./tools/gen_graph 100000 500000 42 > g.txt     # mesmo formato do enunciado (grau médio 10, pesos ±1)
-python3 tools/verify.py g.txt saida.txt        # verificador independente (formato + valor do corte)
-python3 tools/verify.py pequeno.txt s.txt --brute   # compara com força bruta (n <= 24)
-make test                                      # exemplo do enunciado + instância de treino
+make kit                                            # compila o gerador e o verificador do kit
+./tf-maxcut/gerador 100000 42 > g.txt               # grafo novo (n, semente [, grau médio = 10])
+./tf-maxcut/verificador g.txt saida.txt             # confere o formato e imprime o valor do corte
+make test                                           # teste curto: exemplo_n5 + n1000_s1
 ```
 
 ## Estratégia de paralelização
@@ -84,7 +85,7 @@ O que melhora o corte é fazer **mais varreduras por segundo**. Por isso:
 
 ## Testes de desempenho com o nosso gerador (i7-12700H, WSL2 Ubuntu, OpenMPI 5, g++ 15)
 
-Os grafos foram gerados com `tools/gen_graph`. As sementes secretas da competição não são
+Os grafos foram gerados com um gerador próprio, no mesmo formato do enunciado. As sementes secretas da competição não são
 conhecidas, então os valores absolutos mudam de grafo para grafo.
 
 Varreduras por segundo na instância de 100.000 vértices, com 1 rank:
@@ -106,7 +107,7 @@ Execuções completas (80 s de annealing):
 | Média (20k) | 1 × 8 | 2.573.294 | 23.410 | 80,2 s |
 | Média (20k) | 3 × 3 | 1.446.276 | 23.405 | 80,2 s |
 
-Todas as saídas passaram no verificador independente. Nos grafos pequenos (`n = 20`) e no exemplo
+Todas as saídas passaram na verificação de formato e de valor do corte. Nos grafos pequenos (`n = 20`) e no exemplo
 do enunciado, o programa encontrou o ótimo da força bruta.
 
 **Comparação justa, no mesmo grafo de 100 mil vértices:** o Algoritmo 1 do enunciado,
